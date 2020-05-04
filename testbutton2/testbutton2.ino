@@ -3,11 +3,12 @@ const byte ButtonPin = A0;
       byte numButton, oldButton;
 
 byte pressButton(byte Pin)      {
-  // right  0;    0 - 120 1
-  // up     143 130 - 210 2
-  // down   329 280 - 380 3
-  // left   504 420 - 580 4
-  // select 741 700 - 880 5
+  // right  0;    0 - 120 1 righButton
+  // up     143 130 - 210 2 upButton
+  // down   329 280 - 380 3 downButton
+  // left   504 420 - 580 4 leftButton
+  // select 741 700 - 880 5 selectButton
+  // > 900                0 notButton
   Button = analogRead(Pin);
   if (Button < 120){
     return 1;
