@@ -113,15 +113,15 @@ byte lcdprint (byte displ, String linepr1, String linepr2) {
 
 
 void editDoW() {
-//lastimer = millis();
-lastDay = 8; // чтобы выполнить printlcd первый раз
+  //lastimer = millis();
+  lastDay = 8; // чтобы выполнить printlcd первый раз
 
- while (numButton == selectButton || numButton == leftButton) {
-  numButton = pressButton(ButtonPin);
+  while (numButton == selectButton || numButton == leftButton) {
+    numButton = pressButton(ButtonPin);
 
- delay(150); // ждать отпускания кнопки
- }
-//  numButton = notPressed;
+    delay(150); // ждать отпускания кнопки
+  }
+  //  numButton = notPressed;
   iDay = Clock.getDoW() - 1; // номер дня недели в массиве
   while (numButton != selectButton && numButton != leftButton) {
     Line1 = week[iDay];
@@ -130,8 +130,8 @@ lastDay = 8; // чтобы выполнить printlcd первый раз
 
 
     numButton = pressButton(ButtonPin);
-        delay(150);
-        Serial.println(numButton, DEC);
+    delay(150);
+    Serial.println(numButton, DEC);
     if (numButton == upButton) {     // up
       lastDay = iDay;
       if (iDay > 0) iDay--;
@@ -145,43 +145,71 @@ lastDay = 8; // чтобы выполнить printlcd первый раз
   if (iDay != Clock.getDoW() - 1 && numButton == selectButton)
     Clock.setDoW(iDay + 1);
   //  numButton = leftButton;
+  ++area;
 }
 
 void editDay() {
+  lastDay = 100; // выполнить printlcd  в первый раз
   iDay = Clock.getDate();
-  numButton = notPressed;
-  while (numButton != selectButton && numButton != rightButton) {
+  while (numButton == selectButton || numButton == leftButton) {
+    numButton = pressButton(ButtonPin);
+    Serial.print("editDay ");
+    Serial.println(numButton, DEC);
+    delay(150); // ждать отпускания кнопки
+  }
+  while (numButton != selectButton && numButton != leftButton) {
     Line1 = "";
+    Serial.print("editDay 2 ");
+    Serial.println(numButton, DEC);
     if (lswitch) {
+                if (millis() - lastimer > interval/3) { // по истечении переключить вывод строки
+        
+      lastimer = millis();
       lswitch = false;
+      }
+      
       if (iDay < 10)
         Line1 = " ";
       Line1 += iDay;
     }
     else {
-      Line1 = "  ";
+       if (millis() - lastimer > interval/4) { // по истечении переключить вывод строки
+        
+      lastimer = millis();
+
+     
+
       lswitch = true;
+         }
+               Line1 = "  ";
     }
     Line1 += " ";
-    Line1 += month[Clock.getMonth(Century) - 1];
+    Line1 += month[Clock.getMonth(Century)];
     Line1 += " 20";
     if (Clock.getYear() < 10)
       Line1 += "0";
     Line1 += Clock.getYear();
     Line2 = " ";
-    printlcd(Line1, Line2);
+    if (lastDay != iDay) printlcd(Line1, Line2);
+
+
 
     numButton = pressButton(ButtonPin);
-    delay(500);
+    delay(150);
     if (numButton == downButton) {     // up
+      lastDay = iDay;
       if (iDay > 1) iDay--;
     }
     if (numButton == upButton) { // down
+      lastDay = iDay;
       if (iDay < 31) iDay++;
     }
-    if (iDay != Clock.getDate() && numButton == selectButton)
-      Clock.setDate(iDay);
   }
+  if (iDay != Clock.getDate() && numButton == selectButton)
+    Clock.setDate(iDay);
+
+
+  ++area;
 }
 
 void editMonth() {
@@ -190,15 +218,22 @@ void editMonth() {
   Serial.print(numButton, DEC);
   Serial.print(" Marea ");
   Serial.println(area, DEC);
-  iDay = Clock.getMonth(Century) - 1;
-   while (numButton == selectButton || numButton == leftButton) {
-  numButton = pressButton(ButtonPin);
-  delay(150); //ждать отпускания кнопки
-   }
+  iDay = Clock.getMonth(Century);
+  while (numButton == selectButton || numButton == leftButton) {
+    numButton = pressButton(ButtonPin);
+    delay(150); //ждать отпускания кнопки
+  }
   while (numButton != selectButton && numButton != leftButton) {
     if (lswitch) {
+           if (millis() - lastimer > interval/3) { // по истечении переключить вывод строки
+        
+      lastimer = millis();
       lswitch = false;
-      Line1 = Clock.getDate();
+      }
+//      lswitch = false;
+      if (Clock.getDate() < 10) Line1 = " ";
+      else Line1 = "";
+      Line1 += Clock.getDate();
       Line1 += " ";
       Line1 += month[iDay];
       Line1 += " 20";
@@ -211,8 +246,15 @@ void editMonth() {
       delay(150);
     }
     else {
+                 if (millis() - lastimer > interval/4) { // по истечении переключить вывод строки
+        
+      lastimer = millis();
       lswitch = true;
-      Line1 = Clock.getDate();
+      }
+//      lswitch = true;
+      if (Clock.getDate() < 10) Line1 = " ";
+      else Line1 = "";
+      Line1 += Clock.getDate();
       Line1 += " ";
       Line1 += "        ";
       Line1 += " 20";
@@ -225,53 +267,77 @@ void editMonth() {
       delay(150);
     }
     if (numButton == downButton) {     // up
-  lastDay = iDay;
-      if (iDay > 1) iDay--;
+      lastDay = iDay;
+      if (iDay > 0) iDay--;
     }
     if (numButton == upButton) { // down
       lastDay = iDay;
-      if (iDay < 12) iDay++;
+      if (iDay < 11) iDay++;
     }
-    if (iDay != Clock.getMonth(Century) - 1)
-      Clock.setMonth(iDay);
+      Serial.print("Clock ");
+  Serial.print(Clock.getMonth(Century), DEC);
+  Serial.print(" iDay = ");
+  Serial.print(iDay, DEC);
+  Serial.print(" ");
+  Serial.println(month[iDay]);
   }
+
+  if (iDay != Clock.getMonth(Century))
+    Clock.setMonth(iDay);
+
+  ++area;
 }
 
 void editYear() {
+
   lastDay = 100; // выполнить printlcd первый раз
+  lastimer = millis();
+  lswitch = true; // переключатель моргания
   iDay = Clock.getYear();
   while (numButton == selectButton || numButton == leftButton) {
-  numButton = pressButton(ButtonPin);
-Serial.print("editYear ");
-Serial.println(numButton, DEC);
- delay(150); // ждать отпускания кнопки
- }
-  
+    numButton = pressButton(ButtonPin);
+    delay(150); // ждать отпускания кнопки
+  }
   while (numButton != selectButton && numButton != leftButton) {
+
     if (lswitch) {
+      if (millis() - lastimer > interval/3) { // по истечении переключить вывод строки
+        
+      lastimer = millis();
       lswitch = false;
-      Line1 = Clock.getDate();
+      }
+      if (Clock.getDate() < 10) Line1 = " ";
+      else Line1 = "";
+      Line1 += Clock.getDate();
       Line1 += " ";
-      Line1 += month[Clock.getMonth(Century) - 1];
+      Line1 += month[Clock.getMonth(Century)];
       Line1 += " 20";
       if (iDay < 10)
         Line1 += "0";
       Line1 += iDay;
       Line2 = " ";
-      if (lastDay != iDay) printlcd(Line1, Line2);
+ 
 
     }
     else {
+           if (millis() - lastimer > interval/4) { // по истечении переключить вывод строки
+        
+      lastimer = millis();
       lswitch = true;
-      Line1 = Clock.getDate();
+      }
+        if (Clock.getDate() < 10) Line1 = " ";
+      else Line1 = "";
+      Line1 += Clock.getDate();
       Line1 += " ";
-      Line1 += month[Clock.getMonth(Century) - 1];
+      Line1 += month[Clock.getMonth(Century)];
       Line2 = " ";
-      if (lastDay != iDay) printlcd(Line1, Line2);
- 
+   
     }
-         numButton = pressButton(ButtonPin);
-      delay(150);
+
+       printlcd(Line1, Line2);
+
+    numButton = pressButton(ButtonPin);
+    delay(150);
     if (numButton == downButton) {     // up
       lastDay = iDay;
       if (iDay > 0) iDay--;
@@ -280,11 +346,162 @@ Serial.println(numButton, DEC);
       lastDay = iDay;
       if (iDay < 99) iDay++;
     }
-    if (iDay != Clock.getYear())
-      Clock.setYear(iDay);
+//    lastDay = iDay;
   }
+  if (iDay != Clock.getYear())
+    Clock.setYear(iDay);
+
+  ++area;
+}
+void editMin() {
+  String Min;
+  lastDay = 100;
+  Line2 = "";
+  iDay = Clock.getMinute();
+  if (Clock.getMinute() < 10)
+  Min = "0"; else Min = "";
+  Min += Clock.getMinute();
+  Serial.println("editMin");
+  while (numButton == selectButton || numButton == leftButton) {
+    numButton = pressButton(ButtonPin);
+    delay(150); // ждать отпускания кнопки
+  }
+  while (numButton != selectButton && numButton != leftButton) {
+   if (lswitch) {
+      if (millis() - lastimer > interval/3) { // по истечении переключить вывод строки
+        
+      lastimer = millis();
+      lswitch = false;
+      }
+      if (iDay < 10)
+        Min = "0"; else Min = "";
+  Min += iDay;
+   }
+    else {
+                if (millis() - lastimer > interval/4) { // по истечении переключить вывод строки
+        
+      lastimer = millis();
+      lswitch = true;
+      }
+        else Min = "  ";
+
+    }  
+      Line3 = "";
+  if (Clock.getHour(h12, PM) < 10)
+    Line3 += "0";
+  Line3 += Clock.getHour(h12, PM);
+  Line3 += ":";
+ // if (Clock.getMinute() < 10)
+//    Line3 += "0";
+//  Line3 += Clock.getMinute();
+Line3 += Min;
+  Line3 += ":";
+  if (Clock.getSecond() < 10)
+    Line3 += "0";
+  Line3 += Clock.getSecond();
+        if (lastDay != iDay ) printlcd(Line3, Line2);
+    Serial.print("lastDay = ");
+    Serial.print(lastDay, DEC);
+    Serial.print(" iDay = ");
+    Serial.print(iDay, DEC);
+    Serial.print(" Min = ");
+    Serial.print(Min);
+    Serial.print(" lswitch = ");
+    Serial.println(lswitch, DEC);    
+    numButton = pressButton(ButtonPin);
+    delay(150);
+    if (numButton == downButton && iDay > 0) {     // up
+
+      
+        lastDay = iDay;
+          --iDay;
+     // }
+    }
+    if (numButton == upButton && iDay < 59) { // down
+      
+
+      //if (iDay < 59) { 
+        lastDay = iDay;
+        iDay++;
+    //  }
+    }
+  }
+    if (iDay != Clock.getMinute())
+    Clock.setMinute(iDay);
+  ++area;
 }
 
+void editHour() {
+  String Min;
+    Serial.println("editHour");
+  lastDay = 100;
+  Line2 = "";
+  iDay = Clock.getHour(h12, PM);
+  if (Clock.getHour(h12, PM) < 10)
+  Min = "0"; else Min = "";
+  Min += Clock.getHour(h12, PM);
+  while (numButton == selectButton || numButton == leftButton) {
+    numButton = pressButton(ButtonPin);
+    delay(150); // ждать отпускания кнопки
+  }
+  while (numButton != selectButton && numButton != leftButton) {
+   if (lswitch) {
+      if (millis() - lastimer > interval/3) { // по истечении переключить вывод строки
+        
+      lastimer = millis();
+      lswitch = false;
+      }
+      if (iDay < 10)
+        Min = "0"; else Min = "";
+  Min += iDay;
+   }
+    else {
+                if (millis() - lastimer > interval/4) { // по истечении переключить вывод строки
+        
+      lastimer = millis();
+      lswitch = true;
+      }
+        else Min = "  ";
+
+    }  
+      Line3 = "";
+//  if (Clock.getHour(h12, PM) < 10)
+//    Line3 += "0";
+//  Line3 += Clock.getHour(h12, PM);
+Line3 += Min;
+  Line3 += ":";
+  if (Clock.getMinute() < 10)
+    Line3 += "0";
+  Line3 += Clock.getMinute();
+// Line3 += Min;
+  Line3 += ":";
+  if (Clock.getSecond() < 10)
+    Line3 += "0";
+  Line3 += Clock.getSecond();
+        if (lastDay != iDay) printlcd(Line3, Line2);
+     Serial.print("lastDay = ");
+    Serial.print(lastDay, DEC);
+    Serial.print(" iDay = ");
+    Serial.print(iDay, DEC);
+    Serial.print(" Min = ");
+    Serial.print(Min);
+    Serial.print(" lswitch = ");
+    Serial.println(lswitch, DEC);           
+    numButton = pressButton(ButtonPin);
+    delay(150);
+    if (numButton == downButton && iDay > 0) {     // up
+      lastDay = iDay;
+      iDay--;
+    }
+    if (numButton == upButton && iDay < 23) { // down
+      lastDay = iDay;
+      iDay++;
+    }
+  }
+    if (iDay != Clock.getHour(h12, PM))
+    Clock.setHour(iDay);
+  ++area;
+}
 void setup() {
   Serial.begin(9600);
   Wire.begin();
@@ -302,16 +519,17 @@ void setup() {
   // 5 - минуты
   // 6 - секунды
   Clock.setClockMode(false); // 24 часа индикация
-  curtimer = lastimer = millis();
+  lastimer = millis();
   LineNo = true; // строчки не сформированы
 }
 
 void loop() {
   Line1 = week[Clock.getDoW() - 1];
-
-  Line2 = Clock.getDate();
+  if (Clock.getDate() < 10) Line2 = " ";
+  else Line2 = "";
+  Line2 += Clock.getDate();
   Line2 += " ";
-  Line2 += month[Clock.getMonth(Century) - 1];
+  Line2 += month[Clock.getMonth(Century)];
   Line2 += " 20";
   if (Clock.getYear() < 10)
     Line2 += "0";
@@ -341,17 +559,21 @@ void loop() {
 
   if (numButton == leftButton)  // left начинаем править со дня недели
     ++area;
- // else area = 0;// Следующее поле
+  else area = 0;// Следующее поле
   //    numButton = notPressed;
-    Serial.print("numButton ");
-     Serial.print(numButton, DEC);
-      Serial.print(" area ");
-     Serial.println(area, DEC);
+  Serial.print("numButton ");
+  Serial.print(numButton, DEC);
+  Serial.print(" area ");
+  Serial.println(area, DEC);
   if (area == 1) editDoW();
   if (area == 2) editYear();
+
   if (area == 3) editMonth();
+  //    if (area > 2) area = 0;
   if (area == 4) editDay();
-  if (area == 5) area = 0;
+  if (area == 5) editMin();
+  if (area == 6) editHour();
+  if (area > 6) area = 0;
 
 
 
