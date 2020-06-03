@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Atmel Studio Solution File, Format Version 11.00
+VisualStudioVersion = 14.0.23107.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{E66E83B9-2572-4076-B26E-6BE79FF3018A}") = "liquidrus2", "liquidrus2.cppproj", "{609D2044-601A-4403-BCE9-64A9C47E55BF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|AVR = Debug|AVR
+		Release|AVR = Release|AVR
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{609D2044-601A-4403-BCE9-64A9C47E55BF}.Debug|AVR.ActiveCfg = Debug|AVR
+		{609D2044-601A-4403-BCE9-64A9C47E55BF}.Debug|AVR.Build.0 = Debug|AVR
+		{609D2044-601A-4403-BCE9-64A9C47E55BF}.Release|AVR.ActiveCfg = Release|AVR
+		{609D2044-601A-4403-BCE9-64A9C47E55BF}.Release|AVR.Build.0 = Release|AVR
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
